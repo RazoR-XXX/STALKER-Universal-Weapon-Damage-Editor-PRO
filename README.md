@@ -1,6 +1,9 @@
 # STALKER-Universal-Weapon-Damage-Editor-PRO_2.0
 Универсальный редактор урона оружия для всей трилогии S.T.A.L.K.E.R.
 
+<img width="1103" height="733" alt="изображение" src="https://github.com/user-attachments/assets/dd55249f-9e7c-4383-a0fb-3974511b7eef" />
+
+
 🎯 Возможности
 
     🔄 Универсальность - Работает со всеми частями: ТЧ, ЧН, ЗП
