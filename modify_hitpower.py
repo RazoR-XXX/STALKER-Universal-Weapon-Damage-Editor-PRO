@@ -8,6 +8,7 @@ from tkinter import filedialog, messagebox, scrolledtext
 import re
 import base64
 import io
+import sys
 from PIL import Image, ImageTk, ImageDraw
 import random
 import time
@@ -1259,11 +1260,41 @@ class StalkerWeaponEditor:
             # 1. Копируем наш xrAPI.dll в bin
             bin_path = os.path.join(self.game_folder, "bin")
             xrapi_target = os.path.join(bin_path, "xrAPI.dll")
-            our_xrapi = os.path.join(os.path.dirname(__file__), "xrAPI.dll")
+            
+            # СПОСОБ 1: Ищем DLL рядом с исполняемым файлом
+            if getattr(sys, 'frozen', False):
+                # Если запущено как exe (запаковано pyinstaller)
+                exe_dir = os.path.dirname(sys.executable)
+                our_xrapi = os.path.join(exe_dir, "xrAPI.dll")
+            else:
+                # Если запущено как Python скрипт
+                our_xrapi = os.path.join(os.path.dirname(__file__), "xrAPI.dll")
+            
+            # СПОСОБ 2: Ищем в распакованных ресурсах (для --onefile)
+            if not os.path.exists(our_xrapi):
+                try:
+                    # Пробуем найти в временной папке pyinstaller
+                    base_path = sys._MEIPASS
+                    our_xrapi = os.path.join(base_path, "xrAPI.dll")
+                except Exception:
+                    pass
+            
+            # СПОСОБ 3: Ищем в текущей рабочей директории
+            if not os.path.exists(our_xrapi):
+                our_xrapi = os.path.join(os.getcwd(), "xrAPI.dll")
             
             if not os.path.exists(our_xrapi):
-                self.log("❌ Наш xrAPI.dll не найден рядом с редактором!")
+                self.log("❌ Наш xrAPI.dll не найден!")
+                self.log("🔍 Искали в:")
+                self.log(f"   - {os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)}")
+                self.log(f"   - {os.getcwd()}")
+                try:
+                    self.log(f"   - {sys._MEIPASS}")
+                except:
+                    pass
                 return
+            
+            self.log(f"✅ Найден xrAPI.dll: {our_xrapi}")
             
             # Создаем backup оригинального
             if os.path.exists(xrapi_target):
@@ -1275,6 +1306,7 @@ class StalkerWeaponEditor:
             shutil.copy2(our_xrapi, xrapi_target)
             self.log("✅ Наш xrAPI.dll скопирован в bin")
             
+            # Остальной код без изменений...
             # 2. Показываем ПЕРВУЮ инструкцию и ЗАПУСКАЕМ ИГРУ
             game_process = self.show_truestalker_step1()
             
@@ -1336,6 +1368,8 @@ class StalkerWeaponEditor:
                 
         except Exception as e:
             self.log(f"❌ КРИТИЧЕСКАЯ ОШИБКА: {e}")
+            import traceback
+            self.log(traceback.format_exc())
             
         finally:
             if backup_path and os.path.exists(backup_path):
