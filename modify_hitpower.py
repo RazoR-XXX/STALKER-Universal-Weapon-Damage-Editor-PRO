@@ -459,7 +459,7 @@ class StalkerWeaponEditor:
     def open_github(self, event=None):
         """Открывает GitHub проекта в браузере"""
         import webbrowser
-        github_url = "https://github.com/your-username/your-repo"  # ЗАМЕНИ НА СВОЙ URL!
+        github_url = "https://github.com/RazoR-XXX/STALKER-Universal-Weapon-Damage-Editor-PRO"
         webbrowser.open(github_url)
         self.log(f"🌐 Открываю GitHub: {github_url}")
 
@@ -1287,4 +1287,5 @@ if __name__ == "__main__":
         print(f"Ошибка при запуске: {e}")
         import traceback
         traceback.print_exc()
+
         input("Нажмите Enter для выхода...")
